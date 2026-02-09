@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Assistant - Boti</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            background: #f0f2f5; 
+        }
+        
+        /* LEFT PANEL */
+        .left-panel { 
+            width: 280px; 
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white; 
+            padding: 25px; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .left-panel h2 { 
+            margin: 0 0 10px 0; 
+            font-weight: 600; 
+            font-size: 24px;
+        }
+        
+        .left-panel p { 
+            font-size: 13px; 
+            opacity: 0.9; 
+            line-height: 1.5;
+        }
+        
+        .panel-btn {
+            padding: 12px 20px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .panel-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .panel-buttons {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* RIGHT PANEL */
+        .right-panel { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background: #ffffff;
+        }
+        
+        /* CHAT HEADER */
+        .chat-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #dee2e6;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .chat-header h3 {
+            margin: 0;
+            color: #202124;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        /* CHAT BOX */
+        .chat-box { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px;
+            background: #f8f9fa;
+        }
+        
+        .message { 
+            max-width: 75%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            position: relative; 
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user { 
+            background: #007bff; 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,123,255,0.2);
+        }
+        
+        .bot { 
+            background: #ffffff; 
+            color: #202124; 
+            align-self: flex-start; 
+            border-bottom-left-radius: 2px; 
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .typing-indicator {
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        /* FILE QUEUE */
+        .file-queue { 
+            padding: 12px 20px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            background: #fff8e1;
+            border-top: 2px solid #ffd54f;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .file-queue.hidden {
+            display: none;
+        }
+        
+        .file-tag { 
+            background: #e8f0fe; 
+            color: #1967d2; 
+            padding: 8px 14px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            border: 1px solid #d2e3fc;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .file-tag:hover {
+            background: #d2e3fc;
+            transform: translateY(-1px);
+        }
+        
+        .file-size {
+            opacity: 0.7;
+            font-size: 11px;
+        }
+        
+        .remove-file { 
+            cursor: pointer; 
+            color: #d93025; 
+            font-weight: bold; 
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        
+        .remove-file:hover {
+            transform: scale(1.2);
+        }
+
+        /* INPUT AREA */
+        .chat-input-container { 
+            padding: 15px 25px; 
+            border-top: 1px solid #dee2e6; 
+            display: flex; 
+            gap: 12px; 
+            align-items: center;
+            background: white;
+        }
+        
+        input[type="text"] { 
+            flex: 1; 
+            padding: 12px 20px; 
+            border: 1px solid #dadce0; 
+            border-radius: 24px; 
+            outline: none; 
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        
+        input[type="text"]:focus { 
+            border-color: #007bff; 
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        
+        .btn { 
+            padding: 10px 18px; 
+            border-radius: 20px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: all 0.2s; 
+            font-size: 14px;
+        }
+        
+        .upload-btn { 
+            background: #f1f3f4; 
+            color: #5f6368; 
+            border: 1px solid #dadce0;
+        }
+        
+        .upload-btn:hover { 
+            background: #e8eaed;
+            transform: translateY(-1px);
+        }
+        
+        .send-btn { 
+            background: #007bff; 
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+        }
+        
+        .send-btn:hover { 
+            background: #0069d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+        }
+        
+        .send-btn:active {
+            transform: translateY(0);
+        }
+        
+        #fileInput { display: none; }
+        
+        /* SCROLLBAR STYLING */
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* WELCOME MESSAGE */
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5f6368;
+        }
+        
+        .welcome-message h1 {
+            color: #202124;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-message p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>🤖 Boti</h2>
+        <p>Your intelligent HR assistant. Upload CVs to compare candidates or ask me anything!</p>
+        
+        <div class="panel-buttons">
+            <button class="panel-btn" onclick="newChat()">➕ New Chat</button>
+            <button class="panel-btn" onclick="exportChat()">💾 Export Chat</button>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <!-- CHAT HEADER -->
+        <div class="chat-header">
+            <h3>💬 Chat with Boti</h3>
+        </div>
+        
+        <!-- CHAT BOX -->
+        <div id="chatBox" class="chat-box">
+            <div class="welcome-message">
+                <h1>👋 Hey there!</h1>
+                <p>I'm Boti, your AI assistant. Upload some CVs to compare, or just ask me anything!</p>
+            </div>
+        </div>
+        
+        <!-- FILE QUEUE -->
+        <div id="fileQueue" class="file-queue hidden"></div>
+
+        <!-- INPUT AREA -->
+        <div class="chat-input-container">
+            <input type="file" id="fileInput" multiple accept=".pdf" onchange="handleFileSelection()">
+            <button class="btn upload-btn" onclick="document.getElementById('fileInput').click()" title="Upload PDF files">📎 PDF</button>
+            <input type="text" id="userInput" placeholder="Ask a question or describe what to do..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="btn send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = []; 
+        const chatBox = document.getElementById('chatBox');
+        const fileQueueDiv = document.getElementById('fileQueue');
+        const userInput = document.getElementById('userInput');
+
+        // Add message to chat
+        function addMessage(text, type) {
+            // Remove welcome message if exists
+            const welcome = chatBox.querySelector('.welcome-message');
+            if (welcome) welcome.remove();
+            
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTyping() {
+            const typing = document.createElement('div');
+            typing.className = 'message bot typing-indicator';
+            typing.id = 'typing-indicator';
+            typing.innerHTML = '💭 Boti is thinking...';
+            chatBox.appendChild(typing);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Remove typing indicator
+        function removeTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        // Get file icon based on extension
+        function getFileIcon(filename) {
+            if (filename.endsWith('.pdf')) return '📄';
+            if (filename.endsWith('.docx')) return '📝';
+            if (filename.endsWith('.doc')) return '📝';
+            if (filename.endsWith('.xlsx')) return '📊';
+            if (filename.endsWith('.xls')) return '📊';
+            return '📎';
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Handle file selection
+        function handleFileSelection() {
+            const newFiles = Array.from(document.getElementById('fileInput').files);
+            newFiles.forEach(f => {
+                // Prevent duplicates
+                if (!selectedFiles.some(existing => existing.name === f.name && existing.size === f.size)) {
+                    selectedFiles.push(f);
+                }
+            });
+            renderQueue();
+            document.getElementById('fileInput').value = ""; 
+        }
+
+        // Render file queue
+        function renderQueue() {
+            if (selectedFiles.length === 0) {
+                fileQueueDiv.classList.add('hidden');
+                return;
+            }
+            fileQueueDiv.classList.remove('hidden');
+            fileQueueDiv.innerHTML = selectedFiles.map((f, i) => `
+                <div class="file-tag">
+                    ${getFileIcon(f.name)} ${f.name} 
+                    <span class="file-size">(${formatFileSize(f.size)})</span>
+                    <span class="remove-file" onclick="removeFile(${i})" title="Remove file">✕</span>
+                </div>
+            `).join('');
+        }
+
+        // Remove file from queue
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderQueue();
+        }
+
+        // Send message
+        function sendMessage() {
+            const text = userInput.value.trim();
+            
+            // Validation
+            if (!text && selectedFiles.length === 0) {
+                alert("Please type a message or upload at least one PDF file!");
+                return;
+            }
+
+            const formData = new FormData();
+            if (text) formData.append('message', text);
+            
+            selectedFiles.forEach((file, i) => {
+                formData.append(`pdf_file_${i}`, file);
+            });
+            formData.append('file_count', selectedFiles.length);
+
+            // 1. Show User Message
+            let userDisplay = text || "";
+            if (selectedFiles.length > 0) {
+                userDisplay += ` 📎 (${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''})`;
+            }
+            addMessage(userDisplay, 'user');
+
+            // 2. Show Typing Indicator
+            showTyping();
+
+            // 3. Reset UI immediately
+            userInput.value = "";
+            const fileCount = selectedFiles.length;
+            selectedFiles = [];
+            renderQueue();
+
+            // 4. Send to Backend
+            fetch("api/", { method: "POST", body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    removeTyping();
+                    if(data.reply) {
+                        addMessage(data.reply, 'bot');
+                    } else if(data.error) {
+                        addMessage("❌ Error: " + data.error, 'bot');
+                    }
+                })
+                .catch(err => {
+                    removeTyping();
+                    addMessage("❌ Connection failed. Make sure the server is running.", 'bot');
+                    console.error(err);
+                });
+        }
+
+        // New chat
+        function newChat() {
+            // Clear visual chat
+            chatBox.innerHTML = `
+                <div class="welcome-message">
+                    <h1>👋 Fresh Start!</h1>
+                    <p>Chat reset. What can I help you with?</p>
+                </div>
+            `;
+            
+            // Clear files
+            selectedFiles = [];
+            renderQueue();
+            
+            // Clear input
+            userInput.value = "";
+            
+            // Reset backend session
+            fetch("api/?message=__reset__");
+        }
+
+        // Export chat
+        function exportChat() {
+            const messages = Array.from(chatBox.querySelectorAll('.message'))
+                .map(m => {
+                    const type = m.classList.contains('user') ? 'You' : 'Boti';
+                    return `${type}: ${m.innerText}`;
+                })
+                .join('\n\n');
+            
+            if (!messages) {
+                alert("No messages to export!");
+                return;
+            }
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `boti-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            addMessage("💾 Chat exported successfully!", 'bot');
+        }
+
+        // Focus input on load
+        window.onload = () => {
+            userInput.focus();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+BANK HIRING MANUAL FOR INTERNS
+
+COMPANY: BALFIN Group.
+LAST UPDATED: February 2026
+
+========================================
+INTERN POSITION REQUIREMENTS
+========================================
+
+EDUCATION:
+- Must have Bachelor's degree (in progress or completed)
+- Preferred fields: Finance, Economics, Business Administration, Accounting
+- Minimum GPA: 3.0 out of 4.0
+- Graduate students are welcome to apply
+
+AGE & ELIGIBILITY:
+- Must be 18-25 years old
+- Must be legally authorized to work
+- Students in their final year or recent graduates preferred
+
+EXPERIENCE:
+- Minimum 1 previous internship or relevant work experience
+- Financial services experience is a strong plus
+- Volunteer or leadership experience counts
+
+SKILLS (REQUIRED):
+- Strong analytical and problem-solving abilities
+- Excellent written and verbal communication
+- Proficiency in Microsoft Excel and Word
+- Basic understanding of financial concepts
+
+SKILLS (PREFERRED):
+- Knowledge of Python, R, or SQL
+- Experience with data analysis tools
+- Familiarity with financial software (Bloomberg, etc.)
+- Second language (especially Spanish or Mandarin)
+
+========================================
+EVALUATION CRITERIA
+========================================
+
+We evaluate candidates based on the following weights:
+
+1. Education & Academic Performance: 35%
+2. Relevant Experience: 30%
+3. Technical Skills: 20%
+4. Soft Skills & Communication: 15%
+
+SCORING SYSTEM:
+- 90-100: Highly Recommended (Fast-track interview)
+- 75-89: Recommended (Standard interview)
+- 60-74: Consider (Second review needed)
+- Below 60: Not Recommended
+
+========================================
+AUTOMATIC DISQUALIFIERS
+========================================
+
+The following will result in immediate rejection:
+- Criminal record involving fraud or financial crimes
+- GPA below 2.5
+- False information on resume or application
+- No relevant education (non-business degree without explanation)
+- Unable to work legally in the country
+
+========================================
+RED FLAGS (REVIEW CAREFULLY)
+========================================
+
+- Frequent job hopping (more than 3 jobs in 2 years)
+- Unexplained gaps in education or employment
+- No references provided
+- Poor grammar or unprofessional resume format
+- Lack of any extracurricular activities or leadership
+
+========================================
+POSITIVE INDICATORS
+========================================
+
+Look for these strong signals:
+- Dean's List or academic honors
+- Leadership roles in student organizations
+- Relevant coursework (Corporate Finance, Investments, etc.)
+- Certifications (CFA Level 1, Financial Modeling, etc.)
+- Prior banking or finance internships
+- Participation in case competitions or finance clubs
+- Strong recommendations from professors or employers
+
+========================================
+INTERVIEW INVITATION CRITERIA
+========================================
+
+Automatically invite to interview if:
+- GPA 3.5 or higher with finance degree
+- Previous internship at top financial institution
+- Strong technical skills (Python/SQL) + finance background
+- Exceptional leadership experience
+
+Require manager approval before inviting if:
+- GPA between 2.8-3.0
+- Non-traditional background (career change)
+- International students requiring visa sponsorship
+- Candidates with only 1 semester remaining
+
+========================================
+FINAL NOTES
+========================================
+
+Remember: We're looking for candidates who show:
+1. Strong analytical thinking
+2. Genuine interest in finance/banking
+3. Cultural fit with our team values
+4. Growth potential and learning mindset
+
+When in doubt, prioritize candidates who demonstrate curiosity, 
+work ethic, and alignment with our company values over pure 
+technical skills, which can be taught.
