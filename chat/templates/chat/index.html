@@ -1,524 +1,706 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>AI Assistant - Boti</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            margin: 0; 
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            background: #f0f2f5; 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            background: #121212;
+            color: #e0e0e0;
+            overflow: hidden;
         }
-        
-        /* LEFT PANEL */
-        .left-panel { 
-            width: 280px; 
-            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
-            color: white; 
-            padding: 25px; 
-            box-sizing: border-box; 
-            display: flex; 
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .left-panel h2 { 
-            margin: 0 0 10px 0; 
-            font-weight: 600; 
-            font-size: 24px;
-        }
-        
-        .left-panel p { 
-            font-size: 13px; 
-            opacity: 0.9; 
-            line-height: 1.5;
-        }
-        
-        .panel-btn {
-            padding: 12px 20px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .panel-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-        
-        .panel-buttons {
-            margin-top: auto;
+
+        /* ── Left Panel ── */
+        .left-panel {
+            width: 260px;
+            min-width: 260px;
+            background: #000;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            padding: 20px 16px 16px;
+            border-right: 1px solid #1f1f1f;
+            gap: 12px;
         }
-        
-        /* RIGHT PANEL */
-        .right-panel { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background: #ffffff;
+
+        .left-panel-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            padding: 0 4px;
         }
-        
-        /* CHAT HEADER */
+
+        .session-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-list::-webkit-scrollbar { width: 4px; }
+        .session-list::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+
+        .session-item {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        .session-item:hover { background: #141414; }
+        .session-item.active { background: #1c1c1c; border-color: #2a2a2a; }
+        .session-item-title { font-size: 13px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .session-date { font-size: 10px; color: #444; margin-top: 3px; }
+        .session-delete { position: absolute; right: 10px; top: 10px; color: #333; font-size: 12px; display: none; background: none; border: none; cursor: pointer; padding: 2px 5px; }
+        .session-item:hover .session-delete { display: block; color: #666; }
+        .session-delete:hover { color: #f55 !important; }
+
+        .new-chat-btn {
+            background: none;
+            border: 1px solid #222;
+            color: #555;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: left;
+            transition: all 0.15s;
+        }
+        .new-chat-btn:hover { background: #111; color: #aaa; border-color: #333; }
+
+        /* ── Right Panel ── */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #181818;
+            overflow: hidden;
+        }
+
         .chat-header {
-            padding: 15px 25px;
-            border-bottom: 1px solid #dee2e6;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .chat-header h3 {
-            margin: 0;
-            color: #202124;
-            font-weight: 500;
-            font-size: 18px;
-        }
-        
-        /* CHAT BOX */
-        .chat-box { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px;
-            background: #f8f9fa;
-        }
-        
-        .message { 
-            max-width: 75%; 
-            padding: 12px 16px; 
-            border-radius: 18px; 
-            font-size: 14px; 
-            line-height: 1.5; 
-            position: relative; 
-            word-wrap: break-word;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .user { 
-            background: #007bff; 
-            color: white; 
-            align-self: flex-end; 
-            border-bottom-right-radius: 2px;
-            box-shadow: 0 1px 2px rgba(0,123,255,0.2);
-        }
-        
-        .bot { 
-            background: #ffffff; 
-            color: #202124; 
-            align-self: flex-start; 
-            border-bottom-left-radius: 2px; 
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        
-        .typing-indicator {
-            opacity: 0.6;
-            font-style: italic;
-        }
-
-        /* FILE QUEUE */
-        .file-queue { 
-            padding: 12px 20px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            background: #fff8e1;
-            border-top: 2px solid #ffd54f;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-        }
-        
-        .file-queue.hidden {
-            display: none;
-        }
-        
-        .file-tag { 
-            background: #e8f0fe; 
-            color: #1967d2; 
-            padding: 8px 14px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            border: 1px solid #d2e3fc;
-            transition: all 0.2s;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .file-tag:hover {
-            background: #d2e3fc;
-            transform: translateY(-1px);
-        }
-        
-        .file-size {
-            opacity: 0.7;
-            font-size: 11px;
-        }
-        
-        .remove-file { 
-            cursor: pointer; 
-            color: #d93025; 
-            font-weight: bold; 
-            font-size: 14px;
-            transition: transform 0.2s;
-        }
-        
-        .remove-file:hover {
-            transform: scale(1.2);
-        }
-
-        /* INPUT AREA */
-        .chat-input-container { 
-            padding: 15px 25px; 
-            border-top: 1px solid #dee2e6; 
-            display: flex; 
-            gap: 12px; 
+            padding: 14px 24px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            background: white;
+            flex-shrink: 0;
         }
-        
-        input[type="text"] { 
-            flex: 1; 
-            padding: 12px 20px; 
-            border: 1px solid #dadce0; 
-            border-radius: 24px; 
-            outline: none; 
-            font-size: 15px;
-            transition: all 0.2s;
+
+        .chat-header h3 { font-size: 15px; font-weight: 500; color: #bbb; }
+
+        /* ── CV Action Buttons ── */
+        .cv-actions {
+            display: none;
+            gap: 8px;
+            align-items: center;
         }
-        
-        input[type="text"]:focus { 
-            border-color: #007bff; 
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+
+        .cv-action-btn {
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
         }
-        
-        .btn { 
-            padding: 10px 18px; 
-            border-radius: 20px; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: 600; 
-            transition: all 0.2s; 
+        .cv-action-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .cv-action-btn:active { transform: translateY(0); }
+        .cv-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .btn-ratings  { background: #1a4a8a; color: #a8d0ff; }
+        .btn-explain  { background: #2a4a2a; color: #8fcf8f; }
+
+        /* ── Chat Box ── */
+        .chat-box {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-box::-webkit-scrollbar { width: 4px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+        .message {
+            max-width: 78%;
+            padding: 12px 16px;
+            border-radius: 14px;
             font-size: 14px;
+            line-height: 1.65;
+            word-break: break-word;
         }
-        
-        .upload-btn { 
-            background: #f1f3f4; 
-            color: #5f6368; 
-            border: 1px solid #dadce0;
+
+        .user { background: #252525; align-self: flex-end; color: #e0e0e0; border: 1px solid #2e2e2e; }
+        .bot  { background: #1b1b1b; align-self: flex-start; border: 1px solid #252525; color: #d0d0d0; white-space: pre-wrap; font-family: "Segoe UI", monospace; }
+
+        /* ── Session Files Bar ── */
+        .memory-bar {
+            padding: 8px 24px;
+            background: #111;
+            border-top: 1px solid #1e1e1e;
+            display: none;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-shrink: 0;
         }
-        
-        .upload-btn:hover { 
-            background: #e8eaed;
-            transform: translateY(-1px);
-        }
-        
-        .send-btn { 
-            background: #007bff; 
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,123,255,0.2);
-        }
-        
-        .send-btn:hover { 
-            background: #0069d9;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
-        }
-        
-        .send-btn:active {
-            transform: translateY(0);
-        }
-        
-        #fileInput { display: none; }
-        
-        /* SCROLLBAR STYLING */
-        .chat-box::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .chat-box::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        .chat-box::-webkit-scrollbar-thumb {
-            background: #888;
+        .memory-bar.visible { display: flex; }
+        .memory-bar-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+        .memory-tag {
+            background: #0f2a1a;
+            color: #6dbf6d;
+            padding: 3px 10px;
             border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid #1a3d1a;
         }
-        
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: #555;
+
+        /* ── Staged Files Queue (before send) ── */
+        .file-queue {
+            padding: 10px 24px;
+            display: none;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            border-top: 1px solid #1e1e1e;
+            background: #141414;
+            align-items: center;
         }
-        
-        /* WELCOME MESSAGE */
-        .welcome-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: #5f6368;
+        .file-queue.visible { display: flex; }
+        .file-queue-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+
+        .file-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #0d2040;
+            color: #7ab8ff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #1a3a6a;
         }
-        
-        .welcome-message h1 {
-            color: #202124;
-            margin-bottom: 10px;
+        .file-tag-remove {
+            background: none;
+            border: none;
+            color: #4a6a9a;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 0;
+            line-height: 1;
         }
-        
-        .welcome-message p {
+        .file-tag-remove:hover { color: #f55; }
+
+        /* ── Input Area ── */
+        .chat-input-area {
+            padding: 16px 24px;
+            border-top: 1px solid #222;
+            background: #141414;
+            flex-shrink: 0;
+        }
+
+        /* Access memory section */
+        .memory-section {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .memory-section-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+
+        #accessMemoryInput {
+            flex: 1;
+            background: #0e0e0e;
+            border: 1px solid #222;
+            color: #888;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            height: 58px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        #accessMemoryInput:focus { border-color: #2a4a2a; color: #aaa; }
+        #accessMemoryInput::placeholder { color: #333; }
+
+        .save-mem-btn {
+            background: #0f1f0f;
+            color: #4a8a4a;
+            border: 1px solid #1a3a1a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            transition: all 0.15s;
+            align-self: center;
+        }
+        .save-mem-btn:hover { background: #142214; color: #6fbf6f; }
+
+        /* Message input row */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .attach-btn {
+            background: none;
+            border: 1px solid #222;
+            color: #555;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .attach-btn:hover { background: #1a1a1a; color: #aaa; border-color: #333; }
+
+        #userInput {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            background: #0e0e0e;
+            color: #e0e0e0;
+            outline: none;
             font-size: 14px;
-            opacity: 0.8;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        #userInput:focus { border-color: #3a3a3a; }
+        #userInput::placeholder { color: #333; }
+
+        .send-btn {
+            background: #1a3a6a;
+            border: none;
+            color: #7ab8ff;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .send-btn:hover { background: #1e4a8a; }
+
+        .hidden { display: none !important; }
+
+        /* ── Typing indicator ── */
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 14px 16px;
+            align-self: flex-start;
+        }
+        .typing-indicator span {
+            width: 7px; height: 7px;
+            background: #444;
+            border-radius: 50%;
+            animation: bounce 1.2s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); background: #666; }
         }
     </style>
 </head>
 <body>
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
-        <h2>🤖 Boti</h2>
-        <p>Your intelligent HR assistant. Upload CVs to compare candidates or ask me anything!</p>
-        
-        <div class="panel-buttons">
-            <button class="panel-btn" onclick="newChat()">➕ New Chat</button>
-            <button class="panel-btn" onclick="exportChat()">💾 Export Chat</button>
+
+<!-- ── Left Panel ── -->
+<div class="left-panel">
+    <div class="left-panel-title">Conversations</div>
+    <div class="session-list" id="sessionList"></div>
+    <button class="new-chat-btn" onclick="newChat()">＋ New Chat</button>
+</div>
+
+<!-- ── Right Panel ── -->
+<div class="right-panel">
+
+    <div class="chat-header">
+        <h3 id="chatTitle">New Conversation</h3>
+        <div class="cv-actions" id="cvActions">
+            <button class="cv-action-btn btn-ratings" id="ratingsBtn" onclick="giveRatings()">
+                📊 Give Ratings
+            </button>
+            <button class="cv-action-btn btn-explain" id="explainBtn" onclick="explainWinner()">
+                🏆 Explain Winner
+            </button>
         </div>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="right-panel">
-        <!-- CHAT HEADER -->
-        <div class="chat-header">
-            <h3>💬 Chat with Boti</h3>
-        </div>
-        
-        <!-- CHAT BOX -->
-        <div id="chatBox" class="chat-box">
-            <div class="welcome-message">
-                <h1>👋 Hey there!</h1>
-                <p>I'm Boti, your AI assistant. Upload some CVs to compare, or just ask me anything!</p>
-            </div>
-        </div>
-        
-        <!-- FILE QUEUE -->
-        <div id="fileQueue" class="file-queue hidden"></div>
+    <!-- Messages -->
+    <div id="chatBox" class="chat-box"></div>
 
-        <!-- INPUT AREA -->
-        <div class="chat-input-container">
-            <input type="file" id="fileInput" multiple accept=".pdf" onchange="handleFileSelection()">
-            <button class="btn upload-btn" onclick="document.getElementById('fileInput').click()" title="Upload PDF files">📎 PDF</button>
-            <input type="text" id="userInput" placeholder="Ask a question or describe what to do..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button class="btn send-btn" onclick="sendMessage()">Send</button>
-        </div>
+    <!-- Session memory bar (files already saved to this session) -->
+    <div class="memory-bar" id="memoryBar">
+        <span class="memory-bar-label">In memory:</span>
+        <div id="memoryTags" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
 
-    <script>
-        let selectedFiles = []; 
-        const chatBox = document.getElementById('chatBox');
-        const fileQueueDiv = document.getElementById('fileQueue');
-        const userInput = document.getElementById('userInput');
+    <!-- Staged file queue (files selected but not yet sent) -->
+    <div class="file-queue" id="fileQueue">
+        <span class="file-queue-label">Attaching:</span>
+        <div id="fileTagsContainer" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
 
-        // Add message to chat
-        function addMessage(text, type) {
-            // Remove welcome message if exists
-            const welcome = chatBox.querySelector('.welcome-message');
-            if (welcome) welcome.remove();
-            
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.innerText = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+    <!-- Input Area -->
+    <div class="chat-input-area">
 
-        // Show typing indicator
-        function showTyping() {
-            const typing = document.createElement('div');
-            typing.className = 'message bot typing-indicator';
-            typing.id = 'typing-indicator';
-            typing.innerHTML = '💭 Boti is thinking...';
-            chatBox.appendChild(typing);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+        <!-- Access Memory row -->
+        <div class="memory-section">
+            <span class="memory-section-label">Session<br>Memory</span>
+            <textarea id="accessMemoryInput" placeholder="Ground truth for this chat — AI will treat this as fact…"></textarea>
+            <button class="save-mem-btn" onclick="saveAccessMemory()">UPDATE<br>MEMORY</button>
+        </div>
 
-        // Remove typing indicator
-        function removeTyping() {
-            const typing = document.getElementById('typing-indicator');
-            if (typing) typing.remove();
-        }
+        <!-- Message + attach + send row -->
+        <div class="input-row">
+            <input type="file" id="fileInput" multiple class="hidden" onchange="handleFileSelection()">
+            <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach files">📎</button>
+            <input type="text" id="userInput"
+                   placeholder="Type a message… (press Enter to send)"
+                   onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }">
+            <button class="send-btn" onclick="sendMessage()" title="Send">➤</button>
+        </div>
 
-        // Get file icon based on extension
-        function getFileIcon(filename) {
-            if (filename.endsWith('.pdf')) return '📄';
-            if (filename.endsWith('.docx')) return '📝';
-            if (filename.endsWith('.doc')) return '📝';
-            if (filename.endsWith('.xlsx')) return '📊';
-            if (filename.endsWith('.xls')) return '📊';
-            return '📎';
-        }
+    </div>
+</div>
 
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-        }
+<script>
+    let activeSessionId = null;
+    let selectedFiles   = [];   // files staged in the queue but not yet sent
 
-        // Handle file selection
-        function handleFileSelection() {
-            const newFiles = Array.from(document.getElementById('fileInput').files);
-            newFiles.forEach(f => {
-                // Prevent duplicates
-                if (!selectedFiles.some(existing => existing.name === f.name && existing.size === f.size)) {
-                    selectedFiles.push(f);
+    // ── On load ──────────────────────────────────────────────
+    window.onload = loadSessions;
+
+    // ── Session list ─────────────────────────────────────────
+    function loadSessions() {
+        fetch('sessions/')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('sessionList');
+                list.innerHTML = data.sessions.map(s => `
+                    <div class="session-item ${s.id === activeSessionId ? 'active' : ''}"
+                         onclick="loadSession(${s.id}, '${escHtml(s.title)}')">
+                        <span class="session-item-title">${escHtml(s.title)}</span>
+                        <span class="session-date">${s.created_at}</span>
+                        <button class="session-delete" onclick="deleteSession(event,${s.id})">✕</button>
+                    </div>
+                `).join('');
+            });
+    }
+
+    // ── Load a session ────────────────────────────────────────
+    function loadSession(sessionId, title) {
+        activeSessionId = sessionId;
+        document.getElementById('chatTitle').textContent = title;
+
+        // Tell backend we switched
+        fetch(`api/?message=__switch__&session_id=${sessionId}`);
+
+        // Load messages
+        fetch(`messages/${sessionId}/`)
+            .then(r => r.json())
+            .then(data => {
+                const box = document.getElementById('chatBox');
+                box.innerHTML = '';
+                data.messages.forEach(m => addMessage(m.content, m.role === 'user' ? 'user' : 'bot'));
+                box.scrollTop = box.scrollHeight;
+            });
+
+        // Load access memory
+        fetch(`session/${sessionId}/memory/`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('accessMemoryInput').value = data.content || '';
+            });
+
+        // Load session files (already saved)
+        refreshMemoryBar(sessionId);
+        loadSessions();
+    }
+
+    function refreshMemoryBar(sessionId) {
+        fetch(`session/${sessionId}/files/`)
+            .then(r => r.json())
+            .then(data => {
+                const bar  = document.getElementById('memoryBar');
+                const tags = document.getElementById('memoryTags');
+                const cvActions = document.getElementById('cvActions');
+
+                if (data.files && data.files.length > 0) {
+                    bar.classList.add('visible');
+                    tags.innerHTML = data.files.map(f =>
+                        `<div class="memory-tag">📄 ${escHtml(f.filename)}</div>`
+                    ).join('');
+
+                    // Show CV action buttons only when CVs are present
+                    const hasCVs = data.files.some(f => f.file_type === 'CV');
+                    cvActions.style.display = hasCVs ? 'flex' : 'none';
+                } else {
+                    bar.classList.remove('visible');
+                    tags.innerHTML = '';
+                    cvActions.style.display = 'none';
                 }
             });
-            renderQueue();
-            document.getElementById('fileInput').value = ""; 
-        }
+    }
 
-        // Render file queue
-        function renderQueue() {
-            if (selectedFiles.length === 0) {
-                fileQueueDiv.classList.add('hidden');
-                return;
+    // ── File staging (select files without sending yet) ──────
+    function handleFileSelection() {
+        const input = document.getElementById('fileInput');
+        const newFiles = Array.from(input.files);
+        if (!newFiles.length) return;
+
+        // Merge with already-staged files (avoid duplicates by name)
+        newFiles.forEach(f => {
+            if (!selectedFiles.find(x => x.name === f.name)) {
+                selectedFiles.push(f);
             }
-            fileQueueDiv.classList.remove('hidden');
-            fileQueueDiv.innerHTML = selectedFiles.map((f, i) => `
-                <div class="file-tag">
-                    ${getFileIcon(f.name)} ${f.name} 
-                    <span class="file-size">(${formatFileSize(f.size)})</span>
-                    <span class="remove-file" onclick="removeFile(${i})" title="Remove file">✕</span>
-                </div>
-            `).join('');
+        });
+
+        // Reset input so same file can be re-selected if removed
+        input.value = '';
+        renderFileQueue();
+    }
+
+    function renderFileQueue() {
+        const queue = document.getElementById('fileQueue');
+        const container = document.getElementById('fileTagsContainer');
+
+        if (selectedFiles.length === 0) {
+            queue.classList.remove('visible');
+            container.innerHTML = '';
+            return;
         }
 
-        // Remove file from queue
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            renderQueue();
-        }
+        queue.classList.add('visible');
+        container.innerHTML = selectedFiles.map((f, i) => `
+            <div class="file-tag">
+                📄 ${escHtml(f.name)}
+                <button class="file-tag-remove" onclick="removeFile(${i})" title="Remove">✕</button>
+            </div>
+        `).join('');
+    }
 
-        // Send message
-        function sendMessage() {
-            const text = userInput.value.trim();
-            
-            // Validation
-            if (!text && selectedFiles.length === 0) {
-                alert("Please type a message or upload at least one PDF file!");
-                return;
-            }
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderFileQueue();
+    }
 
-            const formData = new FormData();
-            if (text) formData.append('message', text);
-            
-            selectedFiles.forEach((file, i) => {
-                formData.append(`pdf_file_${i}`, file);
+    // ── Send message (with any staged files) ─────────────────
+    function sendMessage() {
+        const textInput = document.getElementById('userInput');
+        const text = textInput.value.trim();
+
+        if (!text && selectedFiles.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('message', text);
+        selectedFiles.forEach((f, i) => formData.append(`file_${i}`, f));
+        formData.append('file_count', selectedFiles.length);
+
+        // Show user bubble
+        const userDisplay = text
+            ? (selectedFiles.length > 0 ? `${text}\n📎 ${selectedFiles.map(f=>f.name).join(', ')}` : text)
+            : `📎 ${selectedFiles.map(f=>f.name).join(', ')}`;
+        addMessage(userDisplay, 'user');
+
+        textInput.value = '';
+        selectedFiles = [];
+        renderFileQueue();
+
+        const typingEl = addTyping();
+
+        fetch('api/', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                removeTyping(typingEl);
+                if (data.reply) {
+                    addMessage(data.reply, 'bot');
+                } else if (data.error) {
+                    addMessage('⚠️ ' + data.error, 'bot');
+                }
+
+                if (data.session_id) {
+                    if (!activeSessionId) activeSessionId = data.session_id;
+                    document.getElementById('chatTitle').textContent = data.session_title || 'Chat';
+                    loadSessions();
+                    refreshMemoryBar(activeSessionId);
+                }
+            })
+            .catch(() => {
+                removeTyping(typingEl);
+                addMessage('⚠️ Connection failed. Please try again.', 'bot');
             });
-            formData.append('file_count', selectedFiles.length);
+    }
 
-            // 1. Show User Message
-            let userDisplay = text || "";
-            if (selectedFiles.length > 0) {
-                userDisplay += ` 📎 (${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''})`;
+    // ── CV quick-action buttons ───────────────────────────────
+    function giveRatings() {
+        if (!activeSessionId) return;
+        setBtnLoading('ratingsBtn', true);
+
+        const formData = new FormData();
+        formData.append('message', '__GIVE_RATINGS__');
+        formData.append('file_count', 0);
+
+        const typingEl = addTyping();
+
+        fetch('api/', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                removeTyping(typingEl);
+                addMessage(data.reply || data.error || 'Error getting ratings.', data.reply ? 'bot' : 'bot');
+                setBtnLoading('ratingsBtn', false);
+            })
+            .catch(() => {
+                removeTyping(typingEl);
+                addMessage('⚠️ Failed to get ratings.', 'bot');
+                setBtnLoading('ratingsBtn', false);
+            });
+    }
+
+    function explainWinner() {
+        if (!activeSessionId) return;
+        setBtnLoading('explainBtn', true);
+
+        const formData = new FormData();
+        formData.append('message', '__EXPLAIN_WINNER__');
+        formData.append('file_count', 0);
+
+        const typingEl = addTyping();
+
+        fetch('api/', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                removeTyping(typingEl);
+                addMessage(data.reply || data.error || 'Error.', data.reply ? 'bot' : 'bot');
+                setBtnLoading('explainBtn', false);
+            })
+            .catch(() => {
+                removeTyping(typingEl);
+                addMessage('⚠️ Failed to explain winner.', 'bot');
+                setBtnLoading('explainBtn', false);
+            });
+    }
+
+    function setBtnLoading(id, loading) {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.disabled = loading;
+        if (id === 'ratingsBtn') btn.textContent = loading ? '⌛ Calculating…' : '📊 Give Ratings';
+        if (id === 'explainBtn') btn.textContent = loading ? '⌛ Thinking…'   : '🏆 Explain Winner';
+    }
+
+    // ── Access Memory ─────────────────────────────────────────
+    function saveAccessMemory() {
+        if (!activeSessionId) {
+            alert('Start or open a chat first.');
+            return;
+        }
+        const content = document.getElementById('accessMemoryInput').value;
+        fetch(`session/${activeSessionId}/memory/save/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ content })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const btn = document.querySelector('.save-mem-btn');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '✅ SAVED';
+                btn.style.color = '#6fbf6f';
+                setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 1500);
             }
-            addMessage(userDisplay, 'user');
+        });
+    }
 
-            // 2. Show Typing Indicator
-            showTyping();
+    // ── New chat ──────────────────────────────────────────────
+    function newChat() {
+        activeSessionId = null;
+        selectedFiles = [];
+        document.getElementById('chatBox').innerHTML = '';
+        document.getElementById('chatTitle').textContent = 'New Conversation';
+        document.getElementById('accessMemoryInput').value = '';
+        document.getElementById('memoryBar').classList.remove('visible');
+        document.getElementById('memoryTags').innerHTML = '';
+        document.getElementById('cvActions').style.display = 'none';
+        renderFileQueue();
+        fetch('api/?message=__reset__').then(() => loadSessions());
+    }
 
-            // 3. Reset UI immediately
-            userInput.value = "";
-            const fileCount = selectedFiles.length;
-            selectedFiles = [];
-            renderQueue();
+    // ── Delete session ────────────────────────────────────────
+    function deleteSession(e, id) {
+        e.stopPropagation();
+        if (!confirm('Delete this conversation?')) return;
+        fetch(`delete/${id}/`).then(() => {
+            if (activeSessionId === id) newChat();
+            else loadSessions();
+        });
+    }
 
-            // 4. Send to Backend
-            fetch("api/", { method: "POST", body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    removeTyping();
-                    if(data.reply) {
-                        addMessage(data.reply, 'bot');
-                    } else if(data.error) {
-                        addMessage("❌ Error: " + data.error, 'bot');
-                    }
-                })
-                .catch(err => {
-                    removeTyping();
-                    addMessage("❌ Connection failed. Make sure the server is running.", 'bot');
-                    console.error(err);
-                });
-        }
+    // ── UI helpers ────────────────────────────────────────────
+    function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        div.textContent = text;
+        const box = document.getElementById('chatBox');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+        return div;
+    }
 
-        // New chat
-        function newChat() {
-            // Clear visual chat
-            chatBox.innerHTML = `
-                <div class="welcome-message">
-                    <h1>👋 Fresh Start!</h1>
-                    <p>Chat reset. What can I help you with?</p>
-                </div>
-            `;
-            
-            // Clear files
-            selectedFiles = [];
-            renderQueue();
-            
-            // Clear input
-            userInput.value = "";
-            
-            // Reset backend session
-            fetch("api/?message=__reset__");
-        }
+    function addTyping() {
+        const el = document.createElement('div');
+        el.className = 'typing-indicator';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        document.getElementById('chatBox').appendChild(el);
+        document.getElementById('chatBox').scrollTop = 99999;
+        return el;
+    }
 
-        // Export chat
-        function exportChat() {
-            const messages = Array.from(chatBox.querySelectorAll('.message'))
-                .map(m => {
-                    const type = m.classList.contains('user') ? 'You' : 'Boti';
-                    return `${type}: ${m.innerText}`;
-                })
-                .join('\n\n');
-            
-            if (!messages) {
-                alert("No messages to export!");
-                return;
-            }
-            
-            const blob = new Blob([messages], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `boti-chat-${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            addMessage("💾 Chat exported successfully!", 'bot');
-        }
+    function removeTyping(el) {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
 
-        // Focus input on load
-        window.onload = () => {
-            userInput.focus();
-        };
-    </script>
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+</script>
 </body>
 </html>
