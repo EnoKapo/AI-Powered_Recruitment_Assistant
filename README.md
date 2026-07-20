@@ -1,6 +1,6 @@
 # 🤖 Boti — AI-Powered Recruitment Assistant
 
-> An internal AI chat assistant built for **BALFIN Group**, designed to streamline CV evaluation, candidate comparison, and HR document analysis using Google Gemini.
+> An internal AI chat assistant, designed to streamline CV evaluation, candidate comparison, and HR document analysis using Google Gemini.
 
 ---
 
@@ -10,7 +10,7 @@
 Attach one or multiple CVs before sending your message — just like Claude or ChatGPT. Files are staged in a queue, and you type your message and press Enter to send everything together. All files are saved to the session's memory so you can keep referencing them across messages.
 
 ### 📊 Give Ratings
-One-click scoring of all CVs uploaded in the session using BALFIN's proprietary rubric (max 115 points). No AI inference needed — scores are calculated instantly in Python and displayed in a clean breakdown per candidate.
+One-click scoring of all CVs uploaded in the session using proprietary rubric (max 115 points). No AI inference needed — scores are calculated instantly in Python and displayed in a clean breakdown per candidate.
 
 ### 🏆 Explain Winner
 After scoring, ask Boti to explain in plain language why the top-ranked candidate stands out — strengths, experience, technical profile, and what differentiates them from the rest.
@@ -120,7 +120,6 @@ chatbot/
 
 ## 🔒 Notes
 
-- This project is intended for **internal use** at BALFIN Group.
 - The Gemini API key is currently hardcoded for development — move it to an environment variable before any production deployment.
 - `db.sqlite3` is local only and not included in version control.
 
