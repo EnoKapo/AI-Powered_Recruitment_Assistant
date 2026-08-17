@@ -38,7 +38,7 @@ All conversations are saved. Switch between past sessions from the sidebar and p
 
 ---
 
-## 📐 BALFIN Scoring Rubric (Max 115 pts)
+## 📐  Scoring Rubric (Max 115 pts)
 
 | Category | Criteria | Points |
 |---|---|---|
